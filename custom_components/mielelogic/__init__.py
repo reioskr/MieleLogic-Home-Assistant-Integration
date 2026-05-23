@@ -72,16 +72,21 @@ def _get_available_slots_for(
     timetable: dict[str, Any],
     target_date: str,
     machine_number: int | None,
+    reservations: list[dict[str, Any]] | None = None,
 ) -> list[str]:
     """Extract available time slots from timetable data.
+
+    Also includes the user's own reservations marked with '(Booked)' so
+    they can be selected for cancellation.
 
     Args:
         timetable: Raw timetable response from API.
         target_date: Date string like '2026-05-24'.
         machine_number: Specific machine, or None for all machines.
+        reservations: User's current reservations from the API.
 
     Returns:
-        List of slot strings like '09:00 - 11:00'.
+        List of slot strings like '09:00 - 11:00' or '11:00 - 13:00 (Booked)'.
     """
     machine_tables = timetable.get("MachineTimeTables", {})
     available_times: set[str] = set()
@@ -107,7 +112,33 @@ def _get_available_slots_for(
             except (ValueError, KeyError):
                 continue
 
-    return sorted(available_times)
+    # User reservations for this machine/date (cancelling)
+    booked_times: set[str] = set()
+    if reservations:
+        for res in reservations:
+            mn = res.get("MachineNumber")
+            if machine_number is not None and mn != machine_number:
+                continue
+            start_str = res.get("Start", "")
+            if not start_str.startswith(target_date):
+                continue
+            try:
+                start_dt = datetime.fromisoformat(start_str)
+                end_dt = datetime.fromisoformat(res["End"])
+                slot_label = (
+                    f"{start_dt.strftime('%H:%M')} - {end_dt.strftime('%H:%M')}"
+                    " (Booked)"
+                )
+                booked_times.add(slot_label)
+            except (ValueError, KeyError):
+                continue
+
+    # Combine and sort by time (strip suffix for sorting)
+    all_slots = sorted(
+        available_times | booked_times,
+        key=lambda s: s[:5],
+    )
+    return all_slots
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -182,7 +213,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             _LOGGER.warning("No timetable data available")
             return
 
-        available = _get_available_slots_for(timetable, target_date, machine_number)
+        reservations = coordinator.data.get("reservations", [])
+        available = _get_available_slots_for(
+            timetable, target_date, machine_number, reservations
+        )
 
         if not available:
             available = ["No slots available"]
