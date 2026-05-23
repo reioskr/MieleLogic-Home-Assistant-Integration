@@ -4,7 +4,7 @@ Custom Home Assistant integration for **MieleLogic** communal laundry booking sy
 
 Book and manage washing machine reservations directly from your Home Assistant dashboard.
 
-![MieleLogic Dashboard](image.png)
+![MieleLogic Dashboard](img.png)
 
 ## Features
 
