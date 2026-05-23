@@ -22,13 +22,25 @@ book_laundry:
           "+6 days": 6
         selected_machine: "{{ states('input_select.laundry_machine') }}"
         selected_date: "{{ states('input_select.laundry_date') }}"
-        selected_slot: "{{ states('input_select.laundry_timeslot') }}"
+        raw_slot: "{{ states('input_select.laundry_timeslot') }}"
+        is_booked: "{{ '(Booked)' in raw_slot }}"
+        selected_slot: "{{ raw_slot | replace(' (Booked)', '') }}"
         day_offset: "{{ date_offset_map[selected_date] }}"
         booking_date: "{{ (now() + timedelta(days=day_offset | int)).strftime('%Y-%m-%d') }}"
         start_hour: "{{ selected_slot.split(' - ')[0] }}"
         end_hour: "{{ selected_slot.split(' - ')[1] }}"
         start_dt: "{{ booking_date }}T{{ start_hour }}:00"
         end_dt: "{{ booking_date }}T{{ end_hour }}:00"
+    - if:
+        - condition: template
+          value_template: "{{ is_booked }}"
+      then:
+        - action: persistent_notification.create
+          data:
+            title: "Already Booked"
+            message: "{{ selected_machine }} at {{ start_hour }}-{{ end_hour }} is already your booking. Use Cancel to remove it."
+            notification_id: laundry_booking
+        - stop: "Slot already booked"
     - action: mielelogic.create_reservation
       data:
         machine_number: "{{ machine_map[selected_machine] | int }}"
@@ -62,13 +74,25 @@ cancel_laundry:
           "+6 days": 6
         selected_machine: "{{ states('input_select.laundry_machine') }}"
         selected_date: "{{ states('input_select.laundry_date') }}"
-        selected_slot: "{{ states('input_select.laundry_timeslot') }}"
+        raw_slot: "{{ states('input_select.laundry_timeslot') }}"
+        is_booked: "{{ '(Booked)' in raw_slot }}"
+        selected_slot: "{{ raw_slot | replace(' (Booked)', '') }}"
         day_offset: "{{ date_offset_map[selected_date] }}"
         booking_date: "{{ (now() + timedelta(days=day_offset | int)).strftime('%Y-%m-%d') }}"
         start_hour: "{{ selected_slot.split(' - ')[0] }}"
         end_hour: "{{ selected_slot.split(' - ')[1] }}"
         start_dt: "{{ booking_date }}T{{ start_hour }}:00"
         end_dt: "{{ booking_date }}T{{ end_hour }}:00"
+    - if:
+        - condition: template
+          value_template: "{{ not is_booked }}"
+      then:
+        - action: persistent_notification.create
+          data:
+            title: "No Booking Found"
+            message: "{{ selected_machine }} at {{ start_hour }}-{{ end_hour }} is not your booking. Select a slot marked (Booked) to cancel."
+            notification_id: laundry_booking
+        - stop: "Not a booked slot"
     - action: mielelogic.cancel_reservation
       data:
         machine_number: "{{ machine_map[selected_machine] | int }}"
