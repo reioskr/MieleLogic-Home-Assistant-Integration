@@ -1,0 +1,35 @@
+laundry_machine:
+  name: Washing Machine
+  icon: mdi:washing-machine
+  options:
+    - "Vask 1"
+    - "Vask 2"
+    - "Vask 3"
+    - "Vask 4"
+    - "Vask 5"
+  initial: "Vask 1"
+
+laundry_date:
+  name: Booking Date
+  icon: mdi:calendar
+  options:
+    - "Today"
+    - "Tomorrow"
+    - "+2 days"
+    - "+3 days"
+    - "+4 days"
+    - "+5 days"
+    - "+6 days"
+  initial: "Today"
+
+laundry_timeslot:
+  name: Time Slot
+  icon: mdi:clock-outline
+  options:
+    - "07:00 - 09:00"
+    - "09:00 - 11:00"
+    - "11:00 - 13:00"
+    - "13:00 - 15:00"
+    - "15:00 - 17:00"
+    - "17:00 - 19:00"
+  initial: "09:00 - 11:00"

@@ -1,0 +1,13 @@
+## Add this to your automations.yaml
+
+- id: mielelogic_update_slots
+  alias: "Laundry - Update available time slots"
+  description: "Updates the time slot dropdown when machine or date selection changes"
+  triggers:
+    - trigger: state
+      entity_id:
+        - input_select.laundry_machine
+        - input_select.laundry_date
+  actions:
+    - action: mielelogic.update_available_slots
+  mode: restart

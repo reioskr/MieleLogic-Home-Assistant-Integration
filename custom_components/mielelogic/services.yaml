@@ -1,0 +1,55 @@
+create_reservation:
+  name: Create Reservation
+  description: Book a washing machine time slot.
+  fields:
+    machine_number:
+      name: Machine Number
+      description: "The machine number to book (e.g. 1-5 for washers)."
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 10
+          mode: box
+    start:
+      name: Start Time
+      description: "Start time in ISO format (e.g. 2026-05-24T09:00:00)."
+      required: true
+      selector:
+        text:
+    end:
+      name: End Time
+      description: "End time in ISO format (e.g. 2026-05-24T11:00:00)."
+      required: true
+      selector:
+        text:
+
+cancel_reservation:
+  name: Cancel Reservation
+  description: Cancel an existing washing machine reservation.
+  fields:
+    machine_number:
+      name: Machine Number
+      description: "The machine number of the reservation to cancel."
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 10
+          mode: box
+    start:
+      name: Start Time
+      description: "Start time of the reservation to cancel (ISO format)."
+      required: true
+      selector:
+        text:
+    end:
+      name: End Time
+      description: "End time of the reservation to cancel (ISO format)."
+      required: true
+      selector:
+        text:
+
+update_available_slots:
+  name: Update Available Slots
+  description: "Refresh the laundry time slot dropdown with actually available slots based on selected machine and date."

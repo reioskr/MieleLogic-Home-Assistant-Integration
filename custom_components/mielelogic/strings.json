@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Miele Logic Laundry",
+        "description": "Enter your MieleLogic credentials (same as mielelogic.com login).",
+        "data": {
+          "username": "Card/User number",
+          "password": "Password",
+          "country": "Country"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid credentials. Check your card number and password.",
+      "cannot_connect": "Cannot connect to MieleLogic servers."
+    },
+    "abort": {
+      "already_configured": "This account is already configured."
+    }
+  }
+}

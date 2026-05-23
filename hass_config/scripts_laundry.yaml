@@ -1,0 +1,81 @@
+## Add these to your scripts.yaml (or merge them in)
+
+book_laundry:
+  alias: "Book Laundry"
+  icon: mdi:calendar-plus
+  description: "Book a washing machine slot based on helper selections"
+  sequence:
+    - variables:
+        machine_map:
+          "Vask 1": 1
+          "Vask 2": 2
+          "Vask 3": 3
+          "Vask 4": 4
+          "Vask 5": 5
+        date_offset_map:
+          "Today": 0
+          "Tomorrow": 1
+          "+2 days": 2
+          "+3 days": 3
+          "+4 days": 4
+          "+5 days": 5
+          "+6 days": 6
+        selected_machine: "{{ states('input_select.laundry_machine') }}"
+        selected_date: "{{ states('input_select.laundry_date') }}"
+        selected_slot: "{{ states('input_select.laundry_timeslot') }}"
+        day_offset: "{{ date_offset_map[selected_date] }}"
+        booking_date: "{{ (now() + timedelta(days=day_offset | int)).strftime('%Y-%m-%d') }}"
+        start_hour: "{{ selected_slot.split(' - ')[0] }}"
+        end_hour: "{{ selected_slot.split(' - ')[1] }}"
+        start_dt: "{{ booking_date }}T{{ start_hour }}:00"
+        end_dt: "{{ booking_date }}T{{ end_hour }}:00"
+    - action: mielelogic.create_reservation
+      data:
+        machine_number: "{{ machine_map[selected_machine] | int }}"
+        start: "{{ start_dt }}"
+        end: "{{ end_dt }}"
+    - action: persistent_notification.create
+      data:
+        title: "Laundry Booked!"
+        message: "{{ selected_machine }} on {{ booking_date }} at {{ start_hour }}-{{ end_hour }}"
+        notification_id: laundry_booking
+
+cancel_laundry:
+  alias: "Cancel Laundry Booking"
+  icon: mdi:calendar-remove
+  description: "Cancel a washing machine reservation based on helper selections"
+  sequence:
+    - variables:
+        machine_map:
+          "Vask 1": 1
+          "Vask 2": 2
+          "Vask 3": 3
+          "Vask 4": 4
+          "Vask 5": 5
+        date_offset_map:
+          "Today": 0
+          "Tomorrow": 1
+          "+2 days": 2
+          "+3 days": 3
+          "+4 days": 4
+          "+5 days": 5
+          "+6 days": 6
+        selected_machine: "{{ states('input_select.laundry_machine') }}"
+        selected_date: "{{ states('input_select.laundry_date') }}"
+        selected_slot: "{{ states('input_select.laundry_timeslot') }}"
+        day_offset: "{{ date_offset_map[selected_date] }}"
+        booking_date: "{{ (now() + timedelta(days=day_offset | int)).strftime('%Y-%m-%d') }}"
+        start_hour: "{{ selected_slot.split(' - ')[0] }}"
+        end_hour: "{{ selected_slot.split(' - ')[1] }}"
+        start_dt: "{{ booking_date }}T{{ start_hour }}:00"
+        end_dt: "{{ booking_date }}T{{ end_hour }}:00"
+    - action: mielelogic.cancel_reservation
+      data:
+        machine_number: "{{ machine_map[selected_machine] | int }}"
+        start: "{{ start_dt }}"
+        end: "{{ end_dt }}"
+    - action: persistent_notification.create
+      data:
+        title: "Booking Cancelled"
+        message: "{{ selected_machine }} on {{ booking_date }} at {{ start_hour }}-{{ end_hour }}"
+        notification_id: laundry_booking

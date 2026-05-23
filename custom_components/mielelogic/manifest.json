@@ -1,0 +1,11 @@
+{
+  "domain": "mielelogic",
+  "name": "Miele Logic Laundry",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/custom-components/mielelogic",
+  "iot_class": "cloud_polling",
+  "requirements": ["requests>=2.28"],
+  "version": "1.0.0"
+}

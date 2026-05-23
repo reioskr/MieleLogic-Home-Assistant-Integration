@@ -1,0 +1,110 @@
+## Lovelace dashboard example
+## (Edit Dashboard > Raw configuration editor)
+
+
+  - icon: mdi:washing-machine
+    theme: kibibit-dark-cards
+    title: Laundry
+    path: laundry
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - show_name: true
+            show_icon: true
+            show_state: true
+            type: glance
+            title: Washers
+            entities:
+              - entity: sensor.laundry_4557_maskine_1
+                name: Vask 1
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  service_data:
+                    entity_id: input_select.laundry_machine
+                    option: Vask 1
+              - entity: sensor.laundry_4557_maskine_2
+                name: Vask 2
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  service_data:
+                    entity_id: input_select.laundry_machine
+                    option: Vask 2
+              - entity: sensor.laundry_4557_maskine_3
+                name: Vask 3
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  service_data:
+                    entity_id: input_select.laundry_machine
+                    option: Vask 3
+              - entity: sensor.laundry_4557_maskine_4
+                name: Vask 4
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  service_data:
+                    entity_id: input_select.laundry_machine
+                    option: Vask 4
+              - entity: sensor.laundry_4557_maskine_5
+                name: Vask 5
+                tap_action:
+                  action: call-service
+                  service: input_select.select_option
+                  service_data:
+                    entity_id: input_select.laundry_machine
+                    option: Vask 5
+          - type: entities
+            title: 📅 Book a Slot
+            entities:
+              - entity: input_select.laundry_machine
+                name: Machine
+              - entity: input_select.laundry_date
+                name: Date
+              - entity: input_select.laundry_timeslot
+                name: Time Slot
+          - type: horizontal-stack
+            cards:
+              - show_name: true
+                show_icon: true
+                type: button
+                name: Book It!
+                icon: mdi:calendar-plus
+                tap_action:
+                  action: call-service
+                  service: script.book_laundry
+                entity: script.book_laundry
+                show_state: false
+              - type: button
+                name: Cancel Booking
+                icon: mdi:calendar-remove
+                tap_action:
+                  action: call-service
+                  service: script.cancel_laundry
+                entity: script.cancel_laundry
+                show_icon: true
+                show_name: true
+      - type: entities
+        title: Reservations
+        entities:
+          - entity: sensor.laundry_4557_reservations
+            name: Active Bookings
+          - entity: sensor.laundry_4557_next_reservation
+            name: Next Booking
+      - type: calendar
+        entities:
+          - calendar.laundry_4557_laundry_bookings
+        initial_view: listWeek
+      - show_name: false
+        show_icon: true
+        show_state: true
+        type: glance
+        entities:
+          - entity: sensor.laundry_4557_maskine_5
+            icon: mdi:tumble-dryer
+            show_last_changed: true
+          - entity: sensor.laundry_4557_maskine_6
+            show_last_changed: true
+        title: Dryers
